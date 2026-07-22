@@ -5,6 +5,7 @@ import Layout from "../components/layout/Layout";
 // Customer Pages
 import Home from "../pages/customer/Home";
 import Equipment from "../pages/customer/Equipment";
+import EquipmentDetails from "../pages/customer/EquipmentDetails";
 import MyRentals from "../pages/customer/MyRentals";
 import Dashboard from "../pages/customer/Dashboard";
 
@@ -29,12 +30,22 @@ function AppRouter() {
           }
         />
 
-        {/* Equipment */}
+        {/* Equipment List */}
         <Route
           path="/equipment"
           element={
             <Layout>
               <Equipment />
+            </Layout>
+          }
+        />
+
+        {/* Equipment Details */}
+        <Route
+          path="/equipment/:id"
+          element={
+            <Layout>
+              <EquipmentDetails />
             </Layout>
           }
         />

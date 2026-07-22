@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const placeholderImage =
   "https://placehold.co/600x400/e5e7eb/6b7280?text=No+Image";
 
@@ -41,12 +43,14 @@ function EquipmentCard({ equipment }) {
           {equipment.available ? "Available" : "Not Available"}
         </p>
 
-        <button
-          className="mt-6 w-full rounded-lg bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700"
-          disabled={!equipment.available}
-        >
-          Rent Now
-        </button>
+        <Link to={`/equipment/${equipment.id}`}>
+          <button
+            className="mt-6 w-full rounded-lg bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            disabled={!equipment.available}
+          >
+            Rent Now
+          </button>
+        </Link>
       </div>
     </div>
   );
