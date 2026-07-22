@@ -1,9 +1,16 @@
-import { ArrowRight, Search, ShieldCheck, Truck } from "lucide-react";
+import { Link } from "react-router-dom";
+import {
+  ArrowRight,
+  Search,
+  ShieldCheck,
+  Truck,
+} from "lucide-react";
 
 function Hero() {
   return (
     <section className="bg-gradient-to-br from-blue-50 to-white">
       <div className="mx-auto flex max-w-7xl flex-col items-center gap-16 px-6 py-20 lg:flex-row">
+
         {/* Left Content */}
         <div className="flex-1">
           <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700">
@@ -31,25 +38,37 @@ function Hero() {
               className="flex-1 px-5 py-4 outline-none"
             />
 
-            <button className="bg-blue-600 px-6 text-white transition hover:bg-blue-700">
+            <Link
+              to="/equipment"
+              className="flex items-center justify-center bg-blue-600 px-6 text-white transition hover:bg-blue-700"
+            >
               <Search size={22} />
-            </button>
+            </Link>
           </div>
 
           {/* Buttons */}
           <div className="mt-8 flex flex-wrap gap-4">
-            <button className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700">
+
+            <Link
+              to="/equipment"
+              className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
+            >
               Browse Equipment
               <ArrowRight size={18} />
-            </button>
+            </Link>
 
-            <button className="rounded-xl border border-gray-300 px-6 py-3 font-semibold transition hover:bg-gray-100">
+            <Link
+              to="/about"
+              className="rounded-xl border border-gray-300 px-6 py-3 font-semibold transition hover:bg-gray-100"
+            >
               Learn More
-            </button>
+            </Link>
+
           </div>
 
           {/* Features */}
           <div className="mt-12 flex flex-wrap gap-8">
+
             <div className="flex items-center gap-2">
               <ShieldCheck className="text-blue-600" />
               <span>Verified Equipment</span>
@@ -59,7 +78,9 @@ function Hero() {
               <Truck className="text-blue-600" />
               <span>Fast Processing</span>
             </div>
+
           </div>
+
         </div>
 
         {/* Right Side Image */}
@@ -70,6 +91,7 @@ function Hero() {
             className="w-full max-w-lg rounded-3xl shadow-2xl"
           />
         </div>
+
       </div>
     </section>
   );

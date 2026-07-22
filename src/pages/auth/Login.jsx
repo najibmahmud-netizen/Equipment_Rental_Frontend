@@ -26,15 +26,24 @@ function Login() {
   localStorage.setItem("access", response.data.access);
   localStorage.setItem("refresh", response.data.refresh);
 
-  console.log("Login successful!");
-  console.log(response.data);
+  // Get logged in user
+  const user = await api.get("/accounts/me/");
 
-  navigate("/dashboard");
-} catch (error) {
-  console.error(
-    "Login failed:",
-    error.response?.data || error.message
+  localStorage.setItem(
+    "user",
+    JSON.stringify(user.data)
   );
+
+  console.log(user.data);
+
+  if (user.data.is_staff) {
+    navigate("/admin");
+  } else {
+    navigate("/dashboard");
+  }
+
+} catch (error) {
+  console.error(error);
 }
   };
 

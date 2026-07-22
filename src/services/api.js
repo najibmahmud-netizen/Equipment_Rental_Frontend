@@ -7,7 +7,7 @@ const api = axios.create({
   },
 });
 
-// Automatically attach JWT token to every request
+// Attach access token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("access");
 
@@ -17,5 +17,47 @@ api.interceptors.request.use((config) => {
 
   return config;
 });
+
+// Refresh expired token automatically
+api.interceptors.response.use(
+  (response) => response,
+
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
+
+      try {
+        const refresh = localStorage.getItem("refresh");
+
+        const response = await axios.post(
+          "http://127.0.0.1:8001/api/accounts/login/refresh/",
+          {
+            refresh,
+          }
+        );
+
+        localStorage.setItem(
+          "access",
+          response.data.access
+        );
+
+        originalRequest.headers.Authorization =
+          `Bearer ${response.data.access}`;
+
+        return api(originalRequest);
+      } catch (err) {
+        localStorage.clear();
+        window.location.href = "/login";
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export default api;
