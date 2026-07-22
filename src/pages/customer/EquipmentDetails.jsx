@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
 const placeholderImage =
@@ -7,8 +7,16 @@ const placeholderImage =
 
 function EquipmentDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [equipment, setEquipment] = useState(null);
+
+  const [formData, setFormData] = useState({
+    start_date: "",
+    end_date: "",
+  });
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchEquipment = async () => {
@@ -23,9 +31,44 @@ function EquipmentDetails() {
     fetchEquipment();
   }, [id]);
 
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    setLoading(true);
+
+    try {
+      await api.post("/rentals/", {
+        equipment: equipment.id,
+        start_date: formData.start_date,
+        end_date: formData.end_date,
+      });
+
+      alert("Rental request submitted successfully!");
+
+      navigate("/my-rentals");
+    } catch (error) {
+      console.error(error);
+
+      if (error.response?.data) {
+        alert(JSON.stringify(error.response.data));
+      } else {
+        alert("Something went wrong.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!equipment) {
     return (
-      <div className="py-20 text-center">
+      <div className="py-20 text-center text-xl">
         Loading...
       </div>
     );
@@ -49,35 +92,68 @@ function EquipmentDetails() {
             {equipment.description}
           </p>
 
-          <p className="mt-6 text-xl font-semibold">
+          <p className="mt-5 text-xl font-semibold">
             KSh {equipment.daily_price}/day
           </p>
 
-          <p className="mt-4">
+          <p className="mt-3">
             Quantity: {equipment.quantity}
           </p>
 
-          <p className="mt-2">
-            Status:
-            <span
-              className={
-                equipment.available
-                  ? "ml-2 text-green-600 font-semibold"
-                  : "ml-2 text-red-600 font-semibold"
-              }
-            >
-              {equipment.available
-                ? "Available"
-                : "Not Available"}
-            </span>
+          <p
+            className={`mt-2 font-semibold ${
+              equipment.available
+                ? "text-green-600"
+                : "text-red-600"
+            }`}
+          >
+            {equipment.available
+              ? "Available"
+              : "Not Available"}
           </p>
 
-          <button
-            className="mt-8 rounded-xl bg-blue-600 px-8 py-3 text-white hover:bg-blue-700"
-            disabled={!equipment.available}
+          <form
+            onSubmit={handleSubmit}
+            className="mt-8 space-y-5"
           >
-            Rent Equipment
-          </button>
+            <div>
+              <label className="mb-2 block font-medium">
+                Start Date
+              </label>
+
+              <input
+                type="date"
+                name="start_date"
+                value={formData.start_date}
+                onChange={handleChange}
+                required
+                className="w-full rounded-lg border px-4 py-3"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block font-medium">
+                End Date
+              </label>
+
+              <input
+                type="date"
+                name="end_date"
+                value={formData.end_date}
+                onChange={handleChange}
+                required
+                className="w-full rounded-lg border px-4 py-3"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={!equipment.available || loading}
+              className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700 disabled:bg-gray-400"
+            >
+              {loading ? "Submitting..." : "Rent Equipment"}
+            </button>
+          </form>
         </div>
       </div>
     </section>
