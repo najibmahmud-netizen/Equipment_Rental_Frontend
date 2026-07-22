@@ -15,11 +15,14 @@ import Register from "../pages/auth/Register";
 
 // Admin Pages
 import AdminDashboard from "../pages/admin/AdminDashboard";
+import AddEquipment from "../pages/admin/AddEquipment";
+import EditEquipment from "../pages/admin/EditEquipment";
 
 function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
+
         {/* Home */}
         <Route
           path="/"
@@ -30,7 +33,7 @@ function AppRouter() {
           }
         />
 
-        {/* Equipment List */}
+        {/* Equipment */}
         <Route
           path="/equipment"
           element={
@@ -40,7 +43,6 @@ function AppRouter() {
           }
         />
 
-        {/* Equipment Details */}
         <Route
           path="/equipment/:id"
           element={
@@ -50,17 +52,7 @@ function AppRouter() {
           }
         />
 
-        {/* Customer Rentals */}
-        <Route
-          path="/my-rentals"
-          element={
-            <Layout>
-              <MyRentals />
-            </Layout>
-          }
-        />
-
-        {/* Customer Dashboard */}
+        {/* Customer */}
         <Route
           path="/dashboard"
           element={
@@ -70,7 +62,16 @@ function AppRouter() {
           }
         />
 
-        {/* Admin Dashboard */}
+        <Route
+          path="/my-rentals"
+          element={
+            <Layout>
+              <MyRentals />
+            </Layout>
+          }
+        />
+
+        {/* Admin */}
         <Route
           path="/admin"
           element={
@@ -80,9 +81,28 @@ function AppRouter() {
           }
         />
 
+        <Route
+          path="/admin/add-equipment"
+          element={
+            <Layout>
+              <AddEquipment />
+            </Layout>
+          }
+        />
+
+        <Route
+          path="/admin/edit-equipment/:id"
+          element={
+            <Layout>
+              <EditEquipment />
+            </Layout>
+          }
+        />
+
         {/* Authentication */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
       </Routes>
     </BrowserRouter>
   );
