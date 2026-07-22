@@ -1,33 +1,24 @@
+import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
-
-const equipment = [
-  {
-    id: 1,
-    name: "HP EliteBook",
-    category: "Laptop",
-    price: "KSh 800/day",
-    image:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=700",
-  },
-  {
-    id: 2,
-    name: "Canon EOS Camera",
-    category: "Camera",
-    price: "KSh 1,200/day",
-    image:
-      "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=700",
-  },
-  {
-    id: 3,
-    name: "Epson Projector",
-    category: "Projector",
-    price: "KSh 950/day",
-    image:
-      "https://images.unsplash.com/photo-1528395874238-34ebe249b3f2?w=700",
-  },
-];
+import api from "../../services/api";
 
 function FeaturedEquipment() {
+  const [equipment, setEquipment] = useState([]);
+
+  useEffect(() => {
+    const fetchEquipment = async () => {
+      try {
+        const response = await api.get("/equipment/");
+        console.table(response.data);
+        setEquipment(response.data);
+      } catch (error) {
+        console.error("Error fetching equipment:", error);
+      }
+    };
+
+    fetchEquipment();
+  }, []);
+
   return (
     <section className="bg-gray-50 py-20">
       <div className="mx-auto max-w-7xl px-6">
@@ -55,22 +46,44 @@ function FeaturedEquipment() {
               className="overflow-hidden rounded-2xl bg-white shadow transition duration-300 hover:-translate-y-2 hover:shadow-xl"
             >
               <img
-                src={item.image}
+                src={
+                  item.image
+                    ? item.image
+                    : "https://placehold.co/600x400?text=Equipment"
+                }
                 alt={item.name}
                 className="h-56 w-full object-cover"
               />
 
               <div className="p-6">
                 <span className="text-sm font-semibold text-blue-600">
-                  {item.category}
+                  {item.category_name}
                 </span>
 
                 <h3 className="mt-2 text-2xl font-bold">
                   {item.name}
                 </h3>
 
+                <p className="mt-3 text-gray-600 line-clamp-2">
+                  {item.description}
+                </p>
+
                 <p className="mt-4 text-lg font-semibold text-gray-700">
-                  {item.price}
+                  KSh {item.daily_price} / day
+                </p>
+
+                <p className="mt-2 text-sm text-gray-500">
+                  Quantity: {item.quantity}
+                </p>
+
+                <p
+                  className={`mt-2 font-semibold ${
+                    item.available
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  {item.available ? "Available" : "Out of Stock"}
                 </p>
 
                 <button className="mt-6 w-full rounded-lg bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700">
