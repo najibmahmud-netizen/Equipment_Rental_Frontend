@@ -19,7 +19,6 @@ function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* Home */}
         <Route
           path="/"
@@ -73,7 +72,6 @@ function AppRouter() {
         {/* Authentication */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-
       </Routes>
     </BrowserRouter>
   );
