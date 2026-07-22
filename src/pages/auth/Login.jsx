@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../../services/api";
-
 function Login() {
+  const navigate = useNavigate();
+
+
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -19,16 +21,21 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await api.post("/accounts/login/", formData);
+  const response = await api.post("/accounts/login/", formData);
 
-      console.log("Login successful!");
-      console.log(response.data);
-    } catch (error) {
-      console.error(
-        "Login failed:",
-        error.response?.data || error.message
-      );
-    }
+  localStorage.setItem("access", response.data.access);
+  localStorage.setItem("refresh", response.data.refresh);
+
+  console.log("Login successful!");
+  console.log(response.data);
+
+  navigate("/dashboard");
+} catch (error) {
+  console.error(
+    "Login failed:",
+    error.response?.data || error.message
+  );
+}
   };
 
   return (
