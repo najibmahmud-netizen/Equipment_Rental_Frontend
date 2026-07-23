@@ -12,12 +12,34 @@ function MyRentals() {
   const fetchRentals = async () => {
     try {
       const response = await api.get("/rentals/");
-      console.log("My Rentals:", response.data);
       setRentals(response.data);
     } catch (error) {
-      console.error("Error loading rentals:", error);
+      console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const cancelRental = async (id) => {
+    const confirmCancel = window.confirm(
+      "Are you sure you want to cancel this rental request?"
+    );
+
+    if (!confirmCancel) return;
+
+    try {
+      await api.delete(`/rentals/${id}/`);
+
+      alert("Rental request cancelled successfully.");
+
+      fetchRentals();
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        error.response?.data?.detail ||
+          "Failed to cancel rental."
+      );
     }
   };
 
@@ -50,19 +72,36 @@ function MyRentals() {
 
               <thead className="bg-blue-600 text-white">
                 <tr>
-                  <th className="px-6 py-4 text-left">Equipment</th>
-                  <th className="px-6 py-4 text-left">Start</th>
-                  <th className="px-6 py-4 text-left">End</th>
-                  <th className="px-6 py-4 text-left">Status</th>
+                  <th className="px-6 py-4 text-left">
+                    Equipment
+                  </th>
+
+                  <th className="px-6 py-4 text-left">
+                    Start
+                  </th>
+
+                  <th className="px-6 py-4 text-left">
+                    End
+                  </th>
+
+                  <th className="px-6 py-4 text-left">
+                    Status
+                  </th>
+
+                  <th className="px-6 py-4 text-center">
+                    Action
+                  </th>
                 </tr>
               </thead>
 
               <tbody>
+
                 {rentals.map((rental) => (
                   <tr
                     key={rental.id}
                     className="border-b"
                   >
+
                     <td className="px-6 py-4">
                       {rental.equipment_name}
                     </td>
@@ -76,6 +115,7 @@ function MyRentals() {
                     </td>
 
                     <td className="px-6 py-4">
+
                       <span
                         className={`rounded-full px-3 py-1 text-sm font-semibold ${
                           rental.status === "Approved"
@@ -89,9 +129,31 @@ function MyRentals() {
                       >
                         {rental.status}
                       </span>
+
                     </td>
+
+                    <td className="px-6 py-4 text-center">
+
+                      {rental.status === "Pending" ? (
+                        <button
+                          onClick={() =>
+                            cancelRental(rental.id)
+                          }
+                          className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                        >
+                          Cancel
+                        </button>
+                      ) : (
+                        <span className="text-gray-400">
+                          —
+                        </span>
+                      )}
+
+                    </td>
+
                   </tr>
                 ))}
+
               </tbody>
 
             </table>
