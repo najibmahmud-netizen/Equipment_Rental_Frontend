@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Layout from "../components/layout/Layout";
+import ProtectedRoute from "../pages/auth/ProtectedRoute";
 
 // Customer Pages
 import Home from "../pages/customer/Home";
@@ -23,7 +24,8 @@ function AppRouter() {
     <BrowserRouter>
       <Routes>
 
-        {/* Home */}
+        {/* Public Pages */}
+
         <Route
           path="/"
           element={
@@ -33,7 +35,6 @@ function AppRouter() {
           }
         />
 
-        {/* Equipment */}
         <Route
           path="/equipment"
           element={
@@ -52,54 +53,67 @@ function AppRouter() {
           }
         />
 
-        {/* Customer */}
+        {/* Customer Protected Routes */}
+
         <Route
           path="/dashboard"
           element={
-            <Layout>
-              <Dashboard />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/my-rentals"
           element={
-            <Layout>
-              <MyRentals />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <MyRentals />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 
-        {/* Admin */}
+        {/* Admin Protected Routes */}
+
         <Route
           path="/admin"
           element={
-            <Layout>
-              <AdminDashboard />
-            </Layout>
+            <ProtectedRoute adminOnly>
+              <Layout>
+                <AdminDashboard />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/admin/add-equipment"
           element={
-            <Layout>
-              <AddEquipment />
-            </Layout>
+            <ProtectedRoute adminOnly>
+              <Layout>
+                <AddEquipment />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/admin/edit-equipment/:id"
           element={
-            <Layout>
-              <EditEquipment />
-            </Layout>
+            <ProtectedRoute adminOnly>
+              <Layout>
+                <EditEquipment />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 
         {/* Authentication */}
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 

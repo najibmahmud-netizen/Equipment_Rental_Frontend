@@ -8,25 +8,23 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchRentals();
-    fetchEquipment();
+    loadData();
   }, []);
 
-  const fetchRentals = async () => {
-    try {
-      const response = await api.get("/rentals/all/");
-      setRentals(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const loadData = async () => {
+    setLoading(true);
 
-  const fetchEquipment = async () => {
     try {
-      const response = await api.get("/equipment/");
-      setEquipment(response.data);
+      const [rentalsResponse, equipmentResponse] = await Promise.all([
+        api.get("/rentals/all/"),
+        api.get("/equipment/"),
+      ]);
+
+      setRentals(rentalsResponse.data);
+      setEquipment(equipmentResponse.data);
     } catch (error) {
       console.error(error);
+      alert("Failed to load dashboard.");
     } finally {
       setLoading(false);
     }
@@ -35,9 +33,8 @@ function AdminDashboard() {
   const approveRental = async (id) => {
     try {
       await api.patch(`/rentals/${id}/approve/`);
-      fetchRentals();
-      fetchEquipment();
       alert("Rental approved successfully.");
+      await loadData();
     } catch (error) {
       console.error(error);
       alert("Failed to approve rental.");
@@ -47,8 +44,8 @@ function AdminDashboard() {
   const rejectRental = async (id) => {
     try {
       await api.patch(`/rentals/${id}/reject/`);
-      fetchRentals();
       alert("Rental rejected successfully.");
+      await loadData();
     } catch (error) {
       console.error(error);
       alert("Failed to reject rental.");
@@ -58,9 +55,8 @@ function AdminDashboard() {
   const returnRental = async (id) => {
     try {
       await api.patch(`/rentals/${id}/return/`);
-      fetchRentals();
-      fetchEquipment();
       alert("Equipment returned successfully.");
+      await loadData();
     } catch (error) {
       console.error(error);
       alert("Failed to return equipment.");
@@ -72,8 +68,8 @@ function AdminDashboard() {
 
     try {
       await api.delete(`/equipment/${id}/`);
-      fetchEquipment();
       alert("Equipment deleted successfully.");
+      await loadData();
     } catch (error) {
       console.error(error);
       alert("Failed to delete equipment.");
@@ -95,9 +91,7 @@ function AdminDashboard() {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold">
-              Admin Dashboard
-            </h1>
+            <h1 className="text-4xl font-bold">Admin Dashboard</h1>
 
             <p className="mt-2 text-gray-600">
               Manage rental requests and equipment.
@@ -114,11 +108,13 @@ function AdminDashboard() {
 
         {/* Rental Requests */}
         <div className="mb-12 overflow-x-auto rounded-xl bg-white shadow">
+
           <h2 className="border-b px-6 py-4 text-2xl font-bold">
             Rental Requests
           </h2>
 
           <table className="min-w-full">
+
             <thead className="bg-blue-600 text-white">
               <tr>
                 <th className="px-4 py-3">Customer</th>
@@ -131,6 +127,7 @@ function AdminDashboard() {
             </thead>
 
             <tbody>
+
               {rentals.length === 0 ? (
                 <tr>
                   <td
@@ -193,15 +190,15 @@ function AdminDashboard() {
                         </button>
                       )}
 
-                      {rental.status === "Rejected" && (
-                        <span className="font-semibold text-red-600">
-                          Rejected
+                      {rental.status === "Returned" && (
+                        <span className="font-semibold text-green-600">
+                          Returned ✓
                         </span>
                       )}
 
-                      {rental.status === "Returned" && (
-                        <span className="font-semibold text-green-600">
-                          Returned
+                      {rental.status === "Rejected" && (
+                        <span className="font-semibold text-red-600">
+                          Rejected
                         </span>
                       )}
 
@@ -210,17 +207,23 @@ function AdminDashboard() {
                   </tr>
                 ))
               )}
+
             </tbody>
+
           </table>
+
         </div>
 
         {/* Equipment Inventory */}
+
         <div className="overflow-x-auto rounded-xl bg-white shadow">
+
           <h2 className="border-b px-6 py-4 text-2xl font-bold">
             Equipment Inventory
           </h2>
 
           <table className="min-w-full">
+
             <thead className="bg-gray-800 text-white">
               <tr>
                 <th className="px-4 py-3">Name</th>
@@ -233,6 +236,7 @@ function AdminDashboard() {
             </thead>
 
             <tbody>
+
               {equipment.length === 0 ? (
                 <tr>
                   <td
@@ -246,9 +250,7 @@ function AdminDashboard() {
                 equipment.map((item) => (
                   <tr key={item.id} className="border-b">
 
-                    <td className="px-4 py-3">
-                      {item.name}
-                    </td>
+                    <td className="px-4 py-3">{item.name}</td>
 
                     <td className="px-4 py-3">
                       {item.category_name}
@@ -287,9 +289,11 @@ function AdminDashboard() {
                   </tr>
                 ))
               )}
+
             </tbody>
 
           </table>
+
         </div>
 
       </div>

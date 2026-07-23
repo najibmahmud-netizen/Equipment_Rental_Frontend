@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import ReviewSection from "../../components/reviews/ReviewSection";
 
 const placeholderImage =
   "https://placehold.co/600x400/e5e7eb/6b7280?text=No+Image";
@@ -18,18 +19,20 @@ function EquipmentDetails() {
 
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchEquipment = async () => {
-      try {
-        const response = await api.get(`/equipment/${id}/`);
-        setEquipment(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  const today = new Date().toISOString().split("T")[0];
 
+  useEffect(() => {
     fetchEquipment();
   }, [id]);
+
+  const fetchEquipment = async () => {
+    try {
+      const response = await api.get(`/equipment/${id}/`);
+      setEquipment(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -41,6 +44,17 @@ function EquipmentDetails() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!localStorage.getItem("access")) {
+      alert("Please login first.");
+      navigate("/login");
+      return;
+    }
+
+    if (formData.end_date < formData.start_date) {
+      alert("End date cannot be before start date.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -51,6 +65,8 @@ function EquipmentDetails() {
       });
 
       alert("Rental request submitted successfully!");
+
+      await fetchEquipment();
 
       navigate("/my-rentals");
     } catch (error) {
@@ -76,14 +92,17 @@ function EquipmentDetails() {
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-16">
+
       <div className="grid gap-10 md:grid-cols-2">
+
         <img
           src={equipment.image || placeholderImage}
           alt={equipment.name}
-          className="w-full rounded-2xl"
+          className="w-full rounded-2xl shadow-lg"
         />
 
         <div>
+
           <h1 className="text-4xl font-bold">
             {equipment.name}
           </h1>
@@ -92,12 +111,12 @@ function EquipmentDetails() {
             {equipment.description}
           </p>
 
-          <p className="mt-5 text-xl font-semibold">
+          <p className="mt-5 text-xl font-semibold text-blue-600">
             KSh {equipment.daily_price}/day
           </p>
 
           <p className="mt-3">
-            Quantity: {equipment.quantity}
+            <strong>Quantity:</strong> {equipment.quantity}
           </p>
 
           <p
@@ -116,6 +135,7 @@ function EquipmentDetails() {
             onSubmit={handleSubmit}
             className="mt-8 space-y-5"
           >
+
             <div>
               <label className="mb-2 block font-medium">
                 Start Date
@@ -124,6 +144,7 @@ function EquipmentDetails() {
               <input
                 type="date"
                 name="start_date"
+                min={today}
                 value={formData.start_date}
                 onChange={handleChange}
                 required
@@ -139,6 +160,7 @@ function EquipmentDetails() {
               <input
                 type="date"
                 name="end_date"
+                min={formData.start_date || today}
                 value={formData.end_date}
                 onChange={handleChange}
                 required
@@ -149,13 +171,20 @@ function EquipmentDetails() {
             <button
               type="submit"
               disabled={!equipment.available || loading}
-              className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700 disabled:bg-gray-400"
+              className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:bg-gray-400"
             >
               {loading ? "Submitting..." : "Rent Equipment"}
             </button>
+
           </form>
+
         </div>
+
       </div>
+
+      {/* Reviews Section */}
+      <ReviewSection equipmentId={id} />
+
     </section>
   );
 }
