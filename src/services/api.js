@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:8000/api";
+const API_URL = "https://equipment-rental-backend-xtx5.onrender.com/api";
 
 const api = axios.create({
   baseURL: API_URL,
@@ -9,18 +9,21 @@ const api = axios.create({
   },
 });
 
-// Attach access token
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access");
+// Attach JWT access token to every request
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("access");
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
 
-  return config;
-});
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
-// Refresh expired token automatically
+// Automatically refresh expired access token
 api.interceptors.response.use(
   (response) => response,
 
@@ -36,6 +39,10 @@ api.interceptors.response.use(
       try {
         const refresh = localStorage.getItem("refresh");
 
+        if (!refresh) {
+          throw new Error("No refresh token found");
+        }
+
         const response = await axios.post(
           `${API_URL}/accounts/login/refresh/`,
           {
@@ -43,15 +50,20 @@ api.interceptors.response.use(
           }
         );
 
-        localStorage.setItem("access", response.data.access);
+        const newAccessToken = response.data.access;
 
-        originalRequest.headers.Authorization =
-          `Bearer ${response.data.access}`;
+        localStorage.setItem("access", newAccessToken);
+
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
         return api(originalRequest);
       } catch (err) {
-        localStorage.clear();
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
+
         window.location.href = "/login";
+
+        return Promise.reject(err);
       }
     }
 
